@@ -104,7 +104,6 @@ route.put("/user/delete/:id", isAuthenticated, async (req, res) => {
     const foundFavoriteComicIndex = foundUser.favorites.findIndex((element) => {
       return element.comicId === req.params.id;
     });
-    console.log(foundFavoriteComicIndex);
 
     if (foundFavoriteComicIndex) {
       const favoritesTab = foundUser.favorites;

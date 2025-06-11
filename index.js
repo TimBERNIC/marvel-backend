@@ -2,9 +2,10 @@ const express = require("express");
 const mongoose = require("mongoose");
 const axios = require("axios");
 const cors = require("cors");
-mongoose.connect("mongodb://localhost:27017/marvel");
 const app = express();
 require("dotenv").config();
+
+mongoose.connect(process.env.MONGODB_URL);
 
 app.use(express.json());
 app.use(cors());
