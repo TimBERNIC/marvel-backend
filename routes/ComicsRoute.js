@@ -39,10 +39,10 @@ route.get("/comics", async (req, res) => {
 });
 
 //Récupérer tout les Comics d'un character par Id
-route.get("/comics/:id", async (req, res) => {
+route.get("/comics/:characterId", async (req, res) => {
   try {
     const response = await axios.get(
-      `https://lereacteur-marvel-api.herokuapp.com/comics/${req.params.id}?apiKey=${marvelKey}`
+      `https://lereacteur-marvel-api.herokuapp.com/comics/${req.params.characterId}?apiKey=${marvelKey}`
     );
 
     return res.status(202).json(response.data);
