@@ -6,49 +6,54 @@ const marvelKey = process.env.MARVEL_API_KEY;
 
 //GET
 
-//récupérer tout les characters
-route.get("/characters/", async (req, res) => {
+// //récupérer tout les characters avec filtre query
+
+route.get("/characters", async (req, res) => {
   try {
+    const { name, limit, skip } = req.query;
+    let filter = "";
+    if (name) {
+      filter += "&name=" + name;
+    }
+    if (limit) {
+      filter += "&limit=" + limit;
+    }
+
+    if (skip) {
+      filter += "&skip=" + skip;
+    }
+
     const response = await axios.get(
-      `https://lereacteur-marvel-api.herokuapp.com/characters?apiKey=${marvelKey}`
+      `https://lereacteur-marvel-api.herokuapp.com/characters?apiKey=${marvelKey}${filter}`
     );
 
-    const globalCharactersTab = response.data.results;
+    const globalCharactersTab = response.data;
 
     return res.status(202).json(globalCharactersTab);
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    if (error.response) {
+      return res.status(500).json({ message: error.response.data });
+    } else {
+      return res.status(500).json({ message: error.message });
+    }
   }
 });
 
-// filtre
-
-route.get("/characters/:name", async (req, res) => {
+route.get("/character/:characterId", async (req, res) => {
   try {
     const response = await axios.get(
-      `https://lereacteur-marvel-api.herokuapp.com/characters?apiKey=${marvelKey}`
+      `https://lereacteur-marvel-api.herokuapp.com/character/${req.params.characterId}?apiKey=${marvelKey}`
     );
 
-    const globalCharactersTab = response.data.results;
+    const charactersInfo = response.data;
 
-    // Si un nom en params
-    // Faire un find avec reg Exp
-    if (req.params) {
-      const regex = new RegExp(req.params.name, "i");
-
-      const foundCharactersByName = await globalCharactersTab.filter(
-        (element) => {
-          return regex.test(element.name);
-        }
-      );
-
-      return res.status(202).json(foundCharactersByName);
-    } else {
-      return res.status(202).json(globalCharactersTab);
-    }
+    return res.status(200).json(charactersInfo);
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    if (error.response) {
+      return res.status(500).json({ message: error.response.data });
+    } else {
+      return res.status(500).json({ message: error.message });
+    }
   }
 });
-
 module.exports = route;

@@ -9,57 +9,32 @@ const marvelKey = process.env.MARVEL_API_KEY;
 
 route.get("/comics", async (req, res) => {
   try {
+    const { title, limit, skip } = req.query;
+    let filter = "";
+    if (title) {
+      filter += "&title=" + title;
+    }
+    if (limit) {
+      filter += "&limit=" + limit;
+    }
+
+    if (skip) {
+      filter += "&skip=" + skip;
+    }
+
     const response = await axios.get(
-      `https://lereacteur-marvel-api.herokuapp.com/comics?apiKey=${marvelKey}`
+      `https://lereacteur-marvel-api.herokuapp.com/comics?apiKey=${marvelKey}${filter}`
     );
 
-    const globalComicsTab = response.data.results;
-    // Si un titre en body
-    // Faire un find avec reg Exp
-    if (req.params) {
-      const regex = new RegExp(req.params.title, "i");
+    const globalComicsTab = response.data;
 
-      const foundComicsByTitle = await globalComicsTab
-        .filter((element) => {
-          return regex.test(element.title);
-        })
-        .sort((a, b) => a.title.localeCompare(b.title));
-
-      return res.status(202).json(foundComicsByTitle);
-    } else {
-      return res.status(202).json(globalComicsTab);
-    }
+    return res.status(202).json(globalComicsTab);
   } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-});
-
-//récupérer avec filtre params
-
-route.get(`/comics/:title`, async (req, res) => {
-  try {
-    const response = await axios.get(
-      `https://lereacteur-marvel-api.herokuapp.com/comics?apiKey=${marvelKey}`
-    );
-
-    const globalComicsTab = response.data.results;
-    if (req.params) {
-      const regex = new RegExp(req.params.title, "i");
-
-      const foundComicsByTitle = await globalComicsTab
-        .filter((element) => {
-          return regex.test(element.title);
-        })
-        .sort((a, b) => a.title.localeCompare(b.title));
-
-      return res.status(202).json(foundComicsByTitle);
+    if (error.response) {
+      return res.status(500).json({ message: error.response.data });
     } else {
-      return res.status(202).json(globalComicsTab);
+      return res.status(500).json({ message: error.message });
     }
-    // Si un titre en params
-    // Faire un find avec reg Exp
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
   }
 });
 
@@ -72,7 +47,11 @@ route.get("/comics/:id", async (req, res) => {
 
     return res.status(202).json(response.data);
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    if (error.response) {
+      return res.status(500).json({ message: error.response.data });
+    } else {
+      return res.status(500).json({ message: error.message });
+    }
   }
 });
 
@@ -85,7 +64,11 @@ route.get("/comic/:id", async (req, res) => {
 
     return res.status(202).json(response.data);
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    if (error.response) {
+      return res.status(500).json({ message: error.response.data });
+    } else {
+      return res.status(500).json({ message: error.message });
+    }
   }
 });
 
