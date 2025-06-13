@@ -7,7 +7,20 @@ const isAuthenticated = require("../middleware/isAuthenticated");
 
 const User = require("../models/User");
 //GET User Info
+router.get("/user", isAuthenticated, async (req, res) => {
+  try {
+    const { username, favorites, email } = req.user;
+    const userInformations = {
+      name: username,
+      favorites: favorites,
+      email: email,
+    };
 
+    return res.status(200).json(userInformations);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
 // POST Create New Acccount
 router.post("/user/signup", async (req, res) => {
   try {
@@ -77,19 +90,19 @@ router.post("/user/login", async (req, res) => {
 
 //PUT Add Favorite
 
-router.put("/user/favorite/:id", isAuthenticated, async (req, res) => {
+router.put("/user/favorite/add", isAuthenticated, async (req, res) => {
   try {
     const foundUser = req.user;
 
     const foundFavoriteComic = foundUser.favorites.find((element) => {
-      return element.comicId === req.params.id;
+      return element.comicId === req.query.id;
     });
 
     if (foundFavoriteComic) {
       return res.status(403).json("Favori déjà existant");
     } else {
       const favoritesTab = foundUser.favorites;
-      favoritesTab.push({ comicId: req.params.id });
+      favoritesTab.push({ comicId: req.query.id });
       await foundUser.save();
       return res.status(201).json("Favoris ajouté à la base de donnée");
     }
@@ -99,19 +112,20 @@ router.put("/user/favorite/:id", isAuthenticated, async (req, res) => {
 });
 
 //PUT Delete Favorite
-route.put("/user/delete/:id", isAuthenticated, async (req, res) => {
+router.put("/user/favorite/remove", isAuthenticated, async (req, res) => {
   try {
     const foundUser = req.user;
     const foundFavoriteComicIndex = foundUser.favorites.findIndex((element) => {
-      return element.comicId === req.params.id;
+      return element.comicId === req.query.id;
     });
 
-    if (foundFavoriteComicIndex) {
+    if (foundFavoriteComicIndex !== -1) {
       const favoritesTab = foundUser.favorites;
       favoritesTab.splice(foundFavoriteComicIndex, 1);
-
       await foundUser.save();
-      return res.status(403).json("Favori supprimé");
+      return res.status(200).json({ message: "Favori supprimé" });
+    } else {
+      return res.status(404).json({ message: "object not found" });
     }
   } catch (error) {
     return res.status(500).json({ message: error.message });
