@@ -1,14 +1,15 @@
 const express = require("express");
-const route = express.Router();
+const router = express.Router();
 const encBase64 = require("crypto-js/enc-base64");
 const SHA256 = require("crypto-js/sha256");
 const uid2 = require("uid2");
 const isAuthenticated = require("../middleware/isAuthenticated");
 
 const User = require("../models/User");
+//GET User Info
 
 // POST Create New Acccount
-route.post("/user/signup", async (req, res) => {
+router.post("/user/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
@@ -49,7 +50,7 @@ route.post("/user/signup", async (req, res) => {
 });
 
 // Login
-route.post("/user/login", async (req, res) => {
+router.post("/user/login", async (req, res) => {
   try {
     const foundAccount = await User.findOne({ email: req.body.email });
     if (!foundAccount) {
@@ -76,7 +77,7 @@ route.post("/user/login", async (req, res) => {
 
 //PUT Add Favorite
 
-route.put("/user/favorite/:id", isAuthenticated, async (req, res) => {
+router.put("/user/favorite/:id", isAuthenticated, async (req, res) => {
   try {
     const foundUser = req.user;
 
@@ -117,4 +118,4 @@ route.put("/user/delete/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-module.exports = route;
+module.exports = router;

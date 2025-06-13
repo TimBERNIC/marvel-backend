@@ -1,5 +1,5 @@
 const express = require("express");
-const route = express.Router();
+const router = express.Router();
 const axios = require("axios");
 
 const marvelKey = process.env.MARVEL_API_KEY;
@@ -8,7 +8,7 @@ const marvelKey = process.env.MARVEL_API_KEY;
 
 // //récupérer tout les characters avec filtre query
 
-route.get("/characters", async (req, res) => {
+router.get("/characters", async (req, res) => {
   try {
     const { name, limit, skip } = req.query;
     let filter = "";
@@ -39,7 +39,7 @@ route.get("/characters", async (req, res) => {
   }
 });
 
-route.get("/character/:characterId", async (req, res) => {
+router.get("/character/:characterId", async (req, res) => {
   try {
     const response = await axios.get(
       `https://lereacteur-marvel-api.herokuapp.com/character/${req.params.characterId}?apiKey=${marvelKey}`
@@ -56,4 +56,4 @@ route.get("/character/:characterId", async (req, res) => {
     }
   }
 });
-module.exports = route;
+module.exports = router;

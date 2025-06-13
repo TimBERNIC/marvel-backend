@@ -1,5 +1,5 @@
 const express = require("express");
-const route = express.Router();
+const router = express.Router();
 const axios = require("axios");
 
 const marvelKey = process.env.MARVEL_API_KEY;
@@ -7,7 +7,7 @@ const marvelKey = process.env.MARVEL_API_KEY;
 // GET
 // récupérer tout les Comics
 
-route.get("/comics", async (req, res) => {
+router.get("/comics", async (req, res) => {
   try {
     const { title, limit, skip } = req.query;
     let filter = "";
@@ -39,7 +39,7 @@ route.get("/comics", async (req, res) => {
 });
 
 //Récupérer tout les Comics d'un character par Id
-route.get("/comics/:characterId", async (req, res) => {
+router.get("/comics/:characterId", async (req, res) => {
   try {
     const response = await axios.get(
       `https://lereacteur-marvel-api.herokuapp.com/comics/${req.params.characterId}?apiKey=${marvelKey}`
@@ -56,7 +56,7 @@ route.get("/comics/:characterId", async (req, res) => {
 });
 
 //Récupérer toutes infos sur un comic
-route.get("/comic/:id", async (req, res) => {
+router.get("/comic/:id", async (req, res) => {
   try {
     const response = await axios.get(
       `https://lereacteur-marvel-api.herokuapp.com/comic/${req.params.id}?apiKey=${marvelKey}`
@@ -72,4 +72,4 @@ route.get("/comic/:id", async (req, res) => {
   }
 });
 
-module.exports = route;
+module.exports = router;
