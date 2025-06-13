@@ -9,7 +9,12 @@ const User = require("../models/User");
 //GET User Info
 router.get("/user", isAuthenticated, async (req, res) => {
   try {
-    return res.status(200).json(req.user);
+    const userInfo = {
+      _id: req.user_id,
+      username: req.user.username,
+      favorites: req.user.favorites,
+    };
+    return res.status(200).json(userInfo);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
