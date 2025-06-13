@@ -52,7 +52,7 @@ router.post("/user/signup", async (req, res) => {
         const responseObject = {
           _id: newUser._id,
           token: newUser.token,
-          account: newUser.account,
+          name: newUser.username,
         };
         return res.status(201).json(responseObject);
       }
@@ -78,7 +78,7 @@ router.post("/user/login", async (req, res) => {
         const responseObject = {
           _id: foundAccount._id,
           token: foundAccount.token,
-          account: foundAccount.account,
+          name: foundAccount.username,
         };
         return res.status(201).json(responseObject);
       }
