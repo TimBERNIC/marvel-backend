@@ -91,16 +91,39 @@ router.post("/user/login", async (req, res) => {
 router.put("/user/favorite/add", isAuthenticated, async (req, res) => {
   try {
     const foundUser = req.user;
+    let favoriteFound = false;
 
-    const foundFavoriteComic = foundUser.favorites.find((element) => {
-      return element.comicId === req.query.id;
-    });
+    if (!req.query.characterId && !req.query.comicId) {
+      return res.status(400).json({
+        message: "query Key invalid.",
+      });
+    }
+    if (req.query.characterId) {
+      const foundFavoriteCharater = foundUser.favorites.find((element) => {
+        return element.characterId === req.query.characterId;
+      });
+      foundFavoriteCharater && (favoriteFound = true);
+    }
 
-    if (foundFavoriteComic) {
+    if (req.query.comicId) {
+      const foundFavoriteComic = foundUser.favorites.find((element) => {
+        return element.comicId === req.query.comicId;
+      });
+      foundFavoriteComic && (favoriteFound = true);
+    }
+
+    if (favoriteFound) {
       return res.status(403).json("Favori déjà existant");
     } else {
       const favoritesTab = foundUser.favorites;
-      favoritesTab.push({ comicId: req.query.id });
+      const newFavorite = {};
+      if (req.query.characterId) {
+        newFavorite.characterId = req.query.characterId;
+      }
+      if (req.query.comicId) {
+        newFavorite.comicId = req.query.comicId;
+      }
+      favoritesTab.push(newFavorite);
       await foundUser.save();
       return res.status(201).json("Favoris ajouté à la base de donnée");
     }
@@ -113,17 +136,40 @@ router.put("/user/favorite/add", isAuthenticated, async (req, res) => {
 router.put("/user/favorite/remove", isAuthenticated, async (req, res) => {
   try {
     const foundUser = req.user;
-    const foundFavoriteComicIndex = foundUser.favorites.findIndex((element) => {
-      return element.comicId === req.query.id;
-    });
 
-    if (foundFavoriteComicIndex !== -1) {
-      const favoritesTab = foundUser.favorites;
-      favoritesTab.splice(foundFavoriteComicIndex, 1);
-      await foundUser.save();
-      return res.status(200).json({ message: "Favori supprimé" });
-    } else {
-      return res.status(404).json({ message: "object not found" });
+    if (!req.query.characterId && !req.query.comicId) {
+      return res.status(400).json({
+        message: "query Key invalid.",
+      });
+    }
+    if (req.query.characterId) {
+      const foundFavoriteCharaterIndex = foundUser.favorites.findIndex(
+        (element) => {
+          return element.characterId === req.query.characterId;
+        }
+      );
+      if (foundFavoriteCharaterIndex !== -1) {
+        foundUser.favorites.splice(foundFavoriteCharaterIndex, 1);
+        await foundUser.save();
+        return res.status(200).json({ message: "Favorite character delete" });
+      } else {
+        return res.status(404).json({ message: "object not found" });
+      }
+    }
+
+    if (req.query.comicId) {
+      const foundFavoriteComicIndex = foundUser.favorites.findIndex(
+        (element) => {
+          return element.comicId === req.query.comicId;
+        }
+      );
+      if (foundFavoriteComicIndex !== -1) {
+        foundUser.favorites.splice(foundFavoriteComicIndex, 1);
+        await foundUser.save();
+        return res.status(200).json({ message: "Favorite comic delete" });
+      } else {
+        return res.status(404).json({ message: "object not found" });
+      }
     }
   } catch (error) {
     return res.status(500).json({ message: error.message });
